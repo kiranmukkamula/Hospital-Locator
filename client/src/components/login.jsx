@@ -14,7 +14,7 @@ const { setLogged } = useContext(AuthContext);
   const handleLogin=(e)=>{
     e.preventDefault()
     
-  fetch('http://localhost:5000/api/auth/login',{
+  fetch('https://hospital-locator-backend.onrender.com/api/auth/login',{
   method:'POST',
   headers:{'content-type':'application/json'},
   body:JSON.stringify(form)
