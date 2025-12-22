@@ -44,7 +44,7 @@ const { setLogged } = useContext(AuthContext);
         </p>
 
         {/* Form */}
-        <form className="mt-6 space-y-4">
+        <form className="mt-6 space-y-4" onSubmit={handleLogin}>
           
           {/* Email */}
           <div>
@@ -65,14 +65,14 @@ const { setLogged } = useContext(AuthContext);
             <label className="text-sm font-medium text-[#009b7d]">
               Password
             </label>
-            <div className="w-full flex mt-1 p-3 rounded-xl bg-[#f0fff0] border border-[#009b7d]/30 focus:border-[#009b7d] outline-none"
+            <div className=" flex mt-1 p-3 rounded-xl bg-[#f0fff0] border border-[#009b7d]/30 focus-within:border-[#009b7d] "
              >
             <input
              placeholder="Enter your password"
               type={eye? "text":"password"}
               name="password"
               onChange={handleChange}
-              className="w-full"
+              className="flex-1 outline-none"
             />
             {eye? <Eye size="19" onClick={()=>close(!eye)}/>:<EyeOff size="19" onClick={()=>close(!eye)}/>}
           </div>
@@ -80,8 +80,8 @@ const { setLogged } = useContext(AuthContext);
         </div>
 
           {/* Button */}
-          <button onClick={handleLogin}
-            type="button"
+          <button
+            type="submit"
             className="w-full py-3 bg-[#009b7d] hover:bg-[#007b63] text-white font-semibold rounded-xl shadow-md transition"
           >
             Login

@@ -50,12 +50,24 @@ const Home = () => {
 
               {/* 3D Search Hospitals Button */}
               <button
+                onClick={() => navigate('/hospitallist')}
                 type="button"
                 className="group relative inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-white to-[#e0f5ed] px-8 py-4 text-sm font-bold text-[#009b7d] shadow-[0_8px_0_rgba(192,222,213,1),0_13px_25px_rgba(0,155,125,0.15)] transition-all hover:translate-y-1 hover:shadow-[0_4px_0_rgba(192,222,213,1),0_8px_20px_rgba(0,155,125,0.15)] active:translate-y-2 active:shadow-[0_0px_0_rgba(192,222,213,1),0_3px_10px_rgba(0,155,125,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#009b7d] focus-visible:ring-offset-2"
               >
                 <span className="relative z-10">Search hospitals</span>
                 {/* Shine effect */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+              </button>
+
+              {/* Government Scheme Button */}
+              <button
+                onClick={() => navigate('/govtscheme')}
+                type="button"
+                className="group relative inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-[#ff6b6b] to-[#ee5a6f] px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-[0_8px_0_rgba(200,50,70,1),0_13px_25px_rgba(238,90,111,0.4)] transition-all hover:translate-y-1 hover:shadow-[0_4px_0_rgba(200,50,70,1),0_8px_20px_rgba(238,90,111,0.3)] active:translate-y-2 active:shadow-[0_0px_0_rgba(200,50,70,1),0_3px_10px_rgba(238,90,111,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ee5a6f] focus-visible:ring-offset-2"
+              >
+                <span className="relative z-10">🏛️ Govt Schemes</span>
+                {/* Shine effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
               </button>
             </div>
 

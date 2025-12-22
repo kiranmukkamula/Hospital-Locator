@@ -1,15 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { Eye,EyeOff } from "lucide-react";
 export default function Register() {
 
   const [form, setForm] = useState({ name: "", email: "", password: "" });
 
   const navigate=useNavigate()
-
+  const [eye,close]=useState(false)
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const handleRegister=(e)=>{
-
     e.preventDefault()
     
   fetch('http://localhost:5000/api/auth/register',{
@@ -55,7 +54,7 @@ export default function Register() {
               onChange={handleChange}
               className="w-full mt-1 p-3 rounded-xl bg-[#f0fff0] border border-[#009b7d]/30 focus:border-[#009b7d] outline-none"
               placeholder="Enter your full name"
-            />
+            required/>
           </div>
 
           {/* Email */}
@@ -69,7 +68,7 @@ export default function Register() {
               onChange={handleChange}
               className="w-full mt-1 p-3 rounded-xl bg-[#f0fff0] border border-[#009b7d]/30 focus:border-[#009b7d] outline-none"
               placeholder="Enter your email"
-            />
+            required/>
           </div>
 
           {/* Password */}
@@ -77,13 +76,16 @@ export default function Register() {
             <label className="text-sm font-medium text-[#009b7d]">
               Password
             </label>
+            <div className="flex mt-1 p-3 rounded-xl bg-[#f0fff0] border border-[#009b7d]/30 focus-within:border-[#009b7d] ">
             <input
-              type="password"
+              type={eye?"text":"password"}
               name="password"
               onChange={handleChange}
-              className="w-full mt-1 p-3 rounded-xl bg-[#f0fff0] border border-[#009b7d]/30 focus:border-[#009b7d] outline-none"
+              className="flex-1 outline-none"
               placeholder="Create a password"
-            />
+            required/>
+            {eye?<Eye size="19" onClick={()=>close(!eye)}/>:<EyeOff size="19" onClick={()=>close(!eye)}/>}
+            </div>
           </div>
 
           {/* Button */}
