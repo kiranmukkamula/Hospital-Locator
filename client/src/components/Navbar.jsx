@@ -19,14 +19,14 @@ const Navbar = () => {
 
     const guestLinks=[
         {name:'Home',href:'/',icon:Home},
-        {name:'Hospitals',href:'/hospitals',icon:MapPin},
+        {name:'Hospitals',href:'/hospitallist',icon:MapPin},
         {name:'Register',href:'/register',icon:User},
         {name:'Login',href:'/login',icon:LogIn}
     ]
 
     const userLinks=[
         {name:'Home',href:'/',icon:Home},
-        {name:'Hospitals',href:'/hospitals',icon:MapPin},
+        {name:'Hospitals',href:'/hospitallist',icon:MapPin},
         {name:'Logout',href:'#',icon:LogOut,onClick:true}
     ]
 
