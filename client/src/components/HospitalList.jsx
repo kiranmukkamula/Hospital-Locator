@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import HospitalMap from "./HospitalMap";
+import Footer from './Footer';
 
 
 const HospitalList = () => {
@@ -12,7 +13,8 @@ const HospitalList = () => {
   const [userLocation, setUserLocation] = useState(null);
 
 
-  
+  const [showLocationModal, setShowLocationModal] = useState(true);
+
 
   // Filter states
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -64,9 +66,17 @@ const HospitalList = () => {
     'Teaching Hospital (Medical College)'
   ];
 
-  useEffect(() => {
-    getUserLocation();
-  }, []);
+  // useEffect(() => {
+  //   getUserLocation();
+  // }, []);
+const handleAllowLocation = () => {
+  setShowLocationModal(false);
+  getUserLocation();
+};
+
+const handleDenyLocation = () => {
+  navigate("/"); // redirect to home
+};
 
   useEffect(() => {
     // Filter categories based on search query
@@ -103,12 +113,14 @@ const HospitalList = () => {
       setLoading(false);
       return;
     }
+//16.5062, 80.6480
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const location = {
-          latitude: position.coords.latitude,  //
+          latitude: position.coords.latitude,
           longitude: position.coords.longitude
+          
         };
         setUserLocation(location);
         fetchNearbyHospitals(location);
@@ -120,7 +132,64 @@ const HospitalList = () => {
     );
   };
 
+  const isNearPunjabRegion = (location) => {
+  return (
+    location.latitude >= 29 &&
+    location.latitude <= 33 &&
+    location.longitude >= 73 &&
+    location.longitude <= 77
+  );
+};
+
+const getPunjabFixedHospitals = (userLocation) => {
+  return [
+    {
+      id: "punjab-1",
+      name: "Shri Baldev Raj Mittal Hospital",
+      address: "7P44+JRR, Khajurla, Punjab 144411",
+      destinationAddress: "7P44+JRR, Khajurla, Punjab 144411",
+      phone: "N/A",
+      latitude: 31.2582,
+      longitude: 75.7079,
+      distance: calculateDistance(
+        userLocation.latitude,
+        userLocation.longitude,
+        31.2582,
+        75.7079
+      ).toFixed(2),
+      beds: 30,
+      hasEmergency: true,
+      category: "General Hospital",
+      specialties: ["General Medicine", "Emergency Care"],
+      ownership: "Trust / NGO Hospital"
+    }
+  ];
+};
+
+const getRoadDistance = async (origin, destination) => {
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${origin.longitude},${origin.latitude};${destination.longitude},${destination.latitude}?overview=false`;
+
+    const res = await fetch(url);
+
+    // 🚨 handle rate limit / HTML response
+    if (!res.ok || !res.headers.get("content-type")?.includes("application/json")) {
+      return null;
+    }
+
+    const data = await res.json();
+
+    if (!data.routes || !data.routes.length) return null;
+
+    return (data.routes[0].distance / 1000).toFixed(2);
+  } catch {
+    return null;
+  }
+};
+
+
   const fetchNearbyHospitals = async (location) => {
+    console.log("Location fetched:", location);
     try {
       const radius = 10000; // 10km in meters
       const query = `
@@ -152,41 +221,75 @@ const HospitalList = () => {
 
       const data = await response.json();
       
-      const processedHospitals = data.elements
-        .filter(element => element.tags && element.tags.name)
-        .map(element => {
-          const lat = element.lat || element.center?.lat;
-          const lon = element.lon || element.center?.lon;
-          
-          if (!lat || !lon) return null;
+const roughHospitals = data.elements
+  .filter(e => e.tags && e.tags.name)
+  .map(e => {
+    const lat = e.lat || e.center?.lat;
+    const lon = e.lon || e.center?.lon;
+    if (!lat || !lon) return null;
 
-          const distance = calculateDistance(
-            location.latitude,
-            location.longitude,
-            lat,
-            lon
-          );
+    return {
+      id: e.id,
+      name: e.tags.name,
+      address:
+        e.tags['addr:full'] ||
+        e.tags['addr:street'] ||
+        'Address not available',
+      phone: e.tags.phone || e.tags['contact:phone'] || 'N/A',
+      latitude: lat,
+      longitude: lon,
+      roughDistance: calculateDistance(
+        location.latitude,
+        location.longitude,
+        lat,
+        lon
+      ),
+      beds: e.tags.beds || Math.floor(Math.random() * 50) + 10,
+    hasEmergency: true,
+      category: determineCategory(e.tags),
+      specialties: determineSpecialties(e.tags),
+      ownership: determineOwnership(e.tags)
+    };
+  })
+  .filter(Boolean)
+  .sort((a, b) => a.roughDistance - b.roughDistance);
+// STEP 2: Accurate road distance ONLY for top 5 hospitals
+const topHospitals = [];
 
-          return {
-            id: element.id,
-            name: element.tags.name,
-            address: element.tags['addr:full'] || element.tags['addr:street'] || 'Address not available',
-            phone: element.tags.phone || element.tags['contact:phone'] || 'N/A',
-            latitude: lat,
-            longitude: lon,
-            distance: distance.toFixed(2),
-            beds: element.tags.beds || Math.floor(Math.random() * 50) + 10,
-            hasEmergency: element.tags.emergency === 'yes' || element.tags['emergency:yes'] === 'yes',
-            category: determineCategory(element.tags),
-            specialties: determineSpecialties(element.tags),
-            ownership: determineOwnership(element.tags)
-          };
-        })
-        .filter(h => h !== null)
-        .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+for (const h of roughHospitals.slice(0, 5)) {
+  const road = await getRoadDistance(location, h);
 
-      setHospitals(processedHospitals);
-      setLoading(false);
+  topHospitals.push({
+    ...h,
+    distance: road ?? h.roughDistance.toFixed(2)
+  });
+
+  // ⏱ small delay to avoid OSRM reset
+  await new Promise(res => setTimeout(res, 300));
+}
+
+// STEP 3: Remaining hospitals use rough distance
+const remainingHospitals = roughHospitals.slice(5).map(h => ({
+  ...h,
+  distance: h.roughDistance.toFixed(2)
+}));
+let finalHospitalList = [...topHospitals, ...remainingHospitals];
+if (isNearPunjabRegion(location)) {
+  const fixedHospitals = getPunjabFixedHospitals(location);
+  finalHospitalList = [
+    ...fixedHospitals,
+    ...finalHospitalList.filter(
+      h => !fixedHospitals.some(f => f.name === h.name)
+    )
+  ];
+}
+
+
+
+setHospitals(finalHospitalList);
+setLoading(false);
+
+
     } catch (err) {
       console.error('Error fetching hospitals:', err);
       setError('Failed to load hospitals. Please try again.');
@@ -260,25 +363,25 @@ const HospitalList = () => {
     );
   };
 
-  // const getDirections = (hospital) => {
-  //   if (!userLocation) {
-  //     alert('Location not available. Please enable location access.');
-  //     return;
-  //   }
-  //   const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${hospital.latitude},${hospital.longitude}`;
-  //   window.open(url, '_blank');
-  // };
 
-  const getDirections = (hospital) => {
+const getDirections = (hospital) => {
   if (!userLocation) return;
 
   const confirmNav = window.confirm(
     `Open Google Maps directions to ${hospital.name}?`
   );
-
   if (!confirmNav) return;
 
-  const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${hospital.latitude},${hospital.longitude}`;
+  let destination;
+
+  // ✅ If custom address exists, use it directly
+  if (hospital.destinationAddress) {
+    destination = encodeURIComponent(hospital.destinationAddress);
+  } else {
+    destination = `${hospital.latitude},${hospital.longitude}`;
+  }
+
+  const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${destination}`;
   window.open(url, "_blank");
 };
 
@@ -300,6 +403,40 @@ const HospitalList = () => {
       <style>
         {`@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');`}
       </style>
+      {showLocationModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur">
+    <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl border border-[#009b7d]/30 p-8 text-center">
+
+      <div className="text-5xl mb-4">📍</div>
+
+      <h2 className="text-2xl font-extrabold text-[#009b7d] mb-3">
+        Allow Location Access
+      </h2>
+
+      <p className="text-[#2a2a2a] font-medium mb-6">
+        We need your location to show nearby hospitals and emergency services.
+      </p>
+
+      <div className="flex gap-4">
+        <button
+          onClick={handleAllowLocation}
+          className="flex-1 rounded-xl bg-gradient-to-br from-[#00b894] to-[#009b7d] px-6 py-3 text-sm font-bold text-white shadow-lg hover:shadow-xl transition-all"
+        >
+          ✅ Allow
+        </button>
+
+        <button
+          onClick={handleDenyLocation}
+          className="flex-1 rounded-xl border-2 border-[#009b7d] px-6 py-3 text-sm font-bold text-[#009b7d] hover:bg-[#009b7d] hover:text-white transition-all"
+        >
+          ❌ Deny
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(240,255,240,1)_0,_rgba(230,250,240,0.5)_100%)]" />
 
@@ -354,96 +491,7 @@ const HospitalList = () => {
               </div>
 
               {/* Ownership Filter - Searchable Dropdown */}
-              <div className="rounded-3xl bg-white/60 backdrop-blur-xl p-6 shadow-[0_8px_32px_rgba(0,155,125,0.15)] border border-white/60">
-                <h3 className="text-lg font-bold text-[#009b7d] mb-4">🏛 Hospital Ownership</h3>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={ownershipSearchQuery}
-                    onChange={(e) => {
-                      setOwnershipSearchQuery(e.target.value);
-                      setShowOwnershipDropdown(true);
-                      if (e.target.value === '') {
-                        setSelectedOwnership('');
-                      }
-                    }}
-                    onFocus={() => setShowOwnershipDropdown(true)}
-                    onBlur={() => {
-                      setTimeout(() => setShowOwnershipDropdown(false), 200);
-                    }}
-                    placeholder="Search or type ownership type..."
-                    className="w-full rounded-xl border-2 border-[#009b7d]/30 bg-white px-4 py-3 text-sm font-semibold text-[#009b7d] focus:border-[#009b7d] focus:outline-none focus:ring-2 focus:ring-[#009b7d]/20"
-                  />
-                  {ownershipSearchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOwnershipSearchQuery('');
-                        setSelectedOwnership('');
-                        setShowOwnershipDropdown(false);
-                      }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#009b7d] hover:text-[#007a63] transition-colors"
-                    >
-                      ✕
-                    </button>
-                  )}
-                  
-                  {/* Ownership Dropdown Menu */}
-                  {showOwnershipDropdown && filteredOwnershipTypes.length > 0 && (
-                    <div className="absolute z-50 w-full mt-2 bg-white rounded-xl border-2 border-[#009b7d]/30 shadow-[0_8px_32px_rgba(0,155,125,0.15)] max-h-64 overflow-y-auto">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedOwnership('');
-                          setOwnershipSearchQuery('');
-                          setShowOwnershipDropdown(false);
-                        }}
-                        className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors hover:bg-[#009b7d]/10 ${
-                          selectedOwnership === ''
-                            ? 'bg-[#009b7d]/20 text-[#009b7d] font-semibold'
-                            : 'text-[#1a1a1a] hover:text-[#009b7d]'
-                        } border-b border-[#009b7d]/10`}
-                      >
-                        <span>All Types</span>
-                      </button>
-                      {filteredOwnershipTypes.map((type, index) => (
-                        <button
-                          key={type}
-                          type="button"
-                          onClick={() => {
-                            setSelectedOwnership(type);
-                            setOwnershipSearchQuery(type);
-                            setShowOwnershipDropdown(false);
-                          }}
-                          className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors hover:bg-[#009b7d]/10 ${
-                            selectedOwnership === type
-                              ? 'bg-[#009b7d]/20 text-[#009b7d] font-semibold'
-                              : 'text-[#1a1a1a] hover:text-[#009b7d]'
-                          } ${index !== filteredOwnershipTypes.length - 1 ? 'border-b border-[#009b7d]/10' : ''}`}
-                        >
-                          <span>{type}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {showOwnershipDropdown && filteredOwnershipTypes.length === 0 && ownershipSearchQuery.trim() !== '' && (
-                    <div className="absolute z-50 w-full mt-2 bg-white rounded-xl border-2 border-[#009b7d]/30 shadow-[0_8px_32px_rgba(0,155,125,0.15)] p-4">
-                      <p className="text-sm text-[#2a2a2a] font-medium text-center">
-                        No ownership types found matching "{ownershipSearchQuery}"
-                      </p>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Selected Ownership Display */}
-                {selectedOwnership && (
-                  <div className="mt-2 rounded-xl bg-[#009b7d]/10 border border-[#009b7d]/30 p-3">
-                    <p className="text-xs font-bold text-[#009b7d] uppercase mb-1">Selected Ownership</p>
-                    <p className="text-sm font-semibold text-[#1a1a1a]">{selectedOwnership}</p>
-                  </div>
-                )}
-              </div>
+             
 
               {/* Clear Filters */}
               {(selectedCategory || selectedSpecialties.length > 0 || selectedOwnership) && (
@@ -617,14 +665,7 @@ const HospitalList = () => {
         </main>
 
         {/* Footer */}
-        <footer className="relative border-t border-[#009b7d]/40 bg-[#009b7d] backdrop-blur py-8 mt-10 text-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h3 className="text-lg font-extrabold text-white">Hospice</h3>
-            <p className="mt-1 text-xs uppercase tracking-wide text-[#e0f5ed] font-bold">
-              Real-time emergency hospital locator
-            </p>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </div>
   );

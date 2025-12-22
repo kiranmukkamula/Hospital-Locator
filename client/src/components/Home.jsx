@@ -2,6 +2,7 @@ import React from 'react'
 import Navbar from './Navbar'
 import Img from '../assets/Img.jpg'
 import { useNavigate } from 'react-router-dom'
+import Footer from './Footer'
 const Home = () => {
     const navigate = useNavigate()
   return (
@@ -34,25 +35,16 @@ const Home = () => {
             </p>
 
             <div className="flex flex-wrap gap-4 pt-2">
-              {/* 3D Emergency Button */}
-              <button onClick={()=>navigate('/hospitals')}
+    
+          
+
+              {/* 3D Search Hospitals Button */}
+              <button onClick={()=>navigate('/hospitallist')}
                 type="button"
                 className="group relative inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-[#00b894] to-[#009b7d] 
                 px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-[0_8px_0_rgba(0,122,99,1),0_13px_25px_rgba(0,155,125,0.4)] transition-all 
                 hover:translate-y-1 hover:shadow-[0_4px_0_rgba(0,122,99,1),0_8px_20px_rgba(0,155,125,0.3)] active:translate-y-2 active:shadow-[0_0px_0_rgba(0,122,99,1),0_3px_10px_rgba(0,155,125,0.2)] focus-visible:outline-none focus-visible:ring-2 
                 focus-visible:ring-[#009b7d] focus-visible:ring-offset-2"
-              >
-                <span className="relative z-10">Emergency now</span>
-                <span className="relative z-10 text-xs font-medium">(share location)</span>
-                {/* Shine effect */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-              </button>
-
-              {/* 3D Search Hospitals Button */}
-              <button
-                onClick={() => navigate('/hospitallist')}
-                type="button"
-                className="group relative inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-white to-[#e0f5ed] px-8 py-4 text-sm font-bold text-[#009b7d] shadow-[0_8px_0_rgba(192,222,213,1),0_13px_25px_rgba(0,155,125,0.15)] transition-all hover:translate-y-1 hover:shadow-[0_4px_0_rgba(192,222,213,1),0_8px_20px_rgba(0,155,125,0.15)] active:translate-y-2 active:shadow-[0_0px_0_rgba(192,222,213,1),0_3px_10px_rgba(0,155,125,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#009b7d] focus-visible:ring-offset-2"
               >
                 <span className="relative z-10">Search hospitals</span>
                 {/* Shine effect */}
@@ -61,13 +53,13 @@ const Home = () => {
 
               {/* Government Scheme Button */}
               <button
-                onClick={() => navigate('/govtscheme')}
+                onClick={() => navigate('/GovtScheme')}
                 type="button"
-                className="group relative inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-[#ff6b6b] to-[#ee5a6f] px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-[0_8px_0_rgba(200,50,70,1),0_13px_25px_rgba(238,90,111,0.4)] transition-all hover:translate-y-1 hover:shadow-[0_4px_0_rgba(200,50,70,1),0_8px_20px_rgba(238,90,111,0.3)] active:translate-y-2 active:shadow-[0_0px_0_rgba(200,50,70,1),0_3px_10px_rgba(238,90,111,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ee5a6f] focus-visible:ring-offset-2"
+                className="group relative inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-white to-[#e0f5ed] px-8 py-4 text-sm font-bold text-[#009b7d] shadow-[0_8px_0_rgba(192,222,213,1),0_13px_25px_rgba(0,155,125,0.15)] transition-all hover:translate-y-1 hover:shadow-[0_4px_0_rgba(192,222,213,1),0_8px_20px_rgba(0,155,125,0.15)] active:translate-y-2 active:shadow-[0_0px_0_rgba(192,222,213,1),0_3px_10px_rgba(0,155,125,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#009b7d] focus-visible:ring-offset-2"
               >
-                <span className="relative z-10">🏛️ Govt Schemes</span>
+                <span className="relative z-10">Govt Scheme</span>
                 {/* Shine effect */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
               </button>
             </div>
 
@@ -184,33 +176,7 @@ const Home = () => {
       </main>
 
       {/* Footer */}
-      <footer className="relative border-t border-[#009b7d]/40 bg-[#009b7d] backdrop-blur py-8 mt-10 text-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h3 className="text-lg font-extrabold text-white">Hospice</h3>
-            <p className="mt-1 text-xs uppercase tracking-wide text-[#e0f5ed] font-bold">Real-time emergency hospital locator</p>
-            <p className="mt-3 text-sm text-[#f0fff0] max-w-sm font-medium">
-              Built to reduce the time between distress and treatment by connecting people to the right hospital, fast.
-            </p>
-          </div>
-
-          <div className="text-sm text-[#e0f5ed] space-y-1 font-medium">
-            <p className="font-bold text-white">Contact</p>
-            <p>Address: 123 Emergency Lane, City Center</p>
-            <p>Phone: +91-98765-43210</p>
-            <p>
-              Email:{' '}
-              <a href="mailto:support@hospice-care.app" className="text-[#f0fff0] hover:text-white underline-offset-2 hover:underline font-semibold">
-                support@hospice-care.app
-              </a>
-            </p>
-            <p className="mt-2 text-xs text-[#e0f5ed]/90">
-              Have suggestions or feedback? Write to us at the email above and help us improve emergency response for
-              everyone.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
       </div>
     </div>
   )

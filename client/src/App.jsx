@@ -1,6 +1,5 @@
 
 import Home from './components/Home'
-import Hospitals from './components/Hospitals'
 import HospitalList from './components/HospitalList'
 import GovtScheme from './components/GovtScheme'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
@@ -13,7 +12,6 @@ const App = () => {
       <Router>
         <Routes>
           <Route path='/' element={<Home/>}/>
-          <Route path='/hospitals' element={<Hospitals/>}/>
           <Route path='/hospitallist' element={<HospitalList/>}/>
           <Route path='/govtscheme' element={<GovtScheme/>}/>
           <Route path='/register' element={<Register/>}/>
