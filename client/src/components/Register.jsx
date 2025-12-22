@@ -11,7 +11,7 @@ export default function Register() {
   const handleRegister=(e)=>{
     e.preventDefault()
     
-  fetch('http://localhost:5000/api/auth/register',{
+  fetch('https://hospital-locator-backend.onrender.com/api/auth/register',{
   method:'POST',
   headers:{
     'Content-Type':'application/json'
