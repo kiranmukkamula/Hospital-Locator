@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import {Menu,X,HeartPulse, Info, MapPin,Home,User,LogIn,LogOut, icons} from 'lucide-react'
+import {Menu,X,HeartPulse, Info, MapPin,Home,User,LogIn,LogOut,MessageCircleMore, icons} from 'lucide-react'
 import { AuthContext } from '../context/AuthContext';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +19,6 @@ const Navbar = () => {
 
     const guestLinks=[
         {name:'Home',href:'/',icon:Home},
-        {name:'Hospitals',href:'/hospitallist',icon:MapPin},
         {name:'Register',href:'/register',icon:User},
         {name:'Login',href:'/login',icon:LogIn}
     ]
@@ -27,7 +26,8 @@ const Navbar = () => {
     const userLinks=[
         {name:'Home',href:'/',icon:Home},
         {name:'Hospitals',href:'/hospitallist',icon:MapPin},
-        {name:'Logout',href:'#',icon:LogOut,onClick:true}
+        {name:'Talk to Doctor',href:"/doctor",icon:MessageCircleMore},
+         {name:'Logout',href:'#',icon:LogOut,onClick:true},
     ]
 
     const navLinks=isLoggedin ? userLinks:guestLinks

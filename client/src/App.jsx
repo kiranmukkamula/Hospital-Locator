@@ -5,6 +5,8 @@ import GovtScheme from './components/GovtScheme'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Register from './components/Register'
 import Login from './components/login'
+import Doctor from './components/Doctor'
+import Message from './components/Message'
 
 const App = () => {
   return (
@@ -16,6 +18,8 @@ const App = () => {
           <Route path='/govtscheme' element={<GovtScheme/>}/>
           <Route path='/register' element={<Register/>}/>
           <Route path='/login' element={<Login/>}/>
+          <Route path='/doctor' element={<Doctor/>}/>
+          <Route path="/message/:doctorId" element={<Message />} />
         </Routes>
       </Router>
     </div>

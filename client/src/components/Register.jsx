@@ -34,7 +34,7 @@ export default function Register() {
         
         {/* Title */}
         <h2 className="text-2xl font-bold text-[#009b7d] text-center">
-          Create Account
+       Create Account
         </h2>
         <p className="text-gray-600 text-center mt-1 text-sm">
           Join us today

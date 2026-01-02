@@ -104,7 +104,7 @@ const Home = () => {
               
               <div className="relative z-10">
                 <h3 className="text-sm font-bold text-[#009b7d] uppercase tracking-wide">Tracking speed</h3>
-                <p className="mt-3 text-4xl font-extrabold text-[#009b7d]">&lt; 2 sec</p>
+                <p className="mt-3 text-4xl font-extrabold text-[#009b7d]">&lt; 5 sec</p>
                 <p className="mt-2 text-xs text-[#2a2a2a] font-medium">
                   Location and hospital availability refresh in under two seconds on average for supported regions.
                 </p>
@@ -120,7 +120,7 @@ const Home = () => {
               
               <div className="relative z-10">
                 <h3 className="text-sm font-bold text-[#009b7d] uppercase tracking-wide">People saved</h3>
-                <p className="mt-3 text-4xl font-extrabold text-[#009b7d]">10,000+</p>
+                <p className="mt-3 text-4xl font-extrabold text-[#009b7d]">5,000+</p>
                 <p className="mt-2 text-xs text-[#2a2a2a] font-medium">
                   Real and simulated deployments have guided thousands of patients to faster emergency care.
                 </p>

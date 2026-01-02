@@ -58,17 +58,7 @@ const HospitalList = () => {
     'Dentistry'
   ];
 
-  // Ownership options
-  const ownershipTypes = [
-    'Government Hospital',
-    'Private Hospital',
-    'Trust / NGO Hospital',
-    'Teaching Hospital (Medical College)'
-  ];
 
-  // useEffect(() => {
-  //   getUserLocation();
-  // }, []);
 const handleAllowLocation = () => {
   setShowLocationModal(false);
   getUserLocation();
@@ -91,18 +81,7 @@ const handleDenyLocation = () => {
     }
   }, [categorySearchQuery]);
 
-  useEffect(() => {
-    // Filter ownership types based on search query
-    if (ownershipSearchQuery.trim() === '') {
-      setFilteredOwnershipTypes(ownershipTypes);
-    } else {
-      const query = ownershipSearchQuery.toLowerCase().trim();
-      const filtered = ownershipTypes.filter(type =>
-        type.toLowerCase().includes(query)
-      );
-      setFilteredOwnershipTypes(filtered);
-    }
-  }, [ownershipSearchQuery]);
+  
 
   const getUserLocation = () => {
     setLoading(true);
@@ -113,15 +92,15 @@ const handleDenyLocation = () => {
       setLoading(false);
       return;
     }
-//16.5062, 80.6480
+//17.3850, 78.4867
 
+// 16.50617,80.64802
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const location = {
-          latitude: position.coords.latitude,
+          latitude: position.coords.latitude  ,
           longitude: position.coords.longitude
-          
-        };
+        };    
         setUserLocation(location);
         fetchNearbyHospitals(location);
       },
@@ -146,7 +125,7 @@ const getPunjabFixedHospitals = (userLocation) => {
     {
       id: "punjab-1",
       name: "Shri Baldev Raj Mittal Hospital",
-      address: "7P44+JRR, Khajurla, Punjab 144411",
+      address: "7P44+JRR, Khapurthala, Punjab 144411",
       destinationAddress: "7P44+JRR, Khajurla, Punjab 144411",
       phone: "N/A",
       latitude: 31.2582,
@@ -256,17 +235,44 @@ const roughHospitals = data.elements
 // STEP 2: Accurate road distance ONLY for top 5 hospitals
 const topHospitals = [];
 
+
+
 for (const h of roughHospitals.slice(0, 5)) {
-  const road = await getRoadDistance(location, h);
+
+  // ✅ ensure coordinates exist
+  if (typeof h.latitude !== "number" || typeof h.longitude !== "number") {
+    topHospitals.push({
+      ...h,
+      distance: h.roughDistance.toFixed(2)
+    });
+    continue;
+  }
+
+  const road = await getRoadDistance(
+    { latitude: location.latitude, longitude: location.longitude },
+    { latitude: h.latitude, longitude: h.longitude }
+  );
 
   topHospitals.push({
     ...h,
     distance: road ?? h.roughDistance.toFixed(2)
   });
 
-  // ⏱ small delay to avoid OSRM reset
   await new Promise(res => setTimeout(res, 300));
 }
+
+
+// for (const h of roughHospitals.slice(0, 5)) {
+//   const road = await getRoadDistance(location, h);
+
+//   topHospitals.push({
+//     ...h,
+//     distance: road ?? h.roughDistance.toFixed(2)
+//   });
+
+//   // ⏱ small delay to avoid OSRM reset
+//   await new Promise(res => setTimeout(res, 300));
+// }
 
 // STEP 3: Remaining hospitals use rough distance
 const remainingHospitals = roughHospitals.slice(5).map(h => ({
@@ -372,14 +378,18 @@ const getDirections = (hospital) => {
   );
   if (!confirmNav) return;
 
-  let destination;
 
-  // ✅ If custom address exists, use it directly
-  if (hospital.destinationAddress) {
-    destination = encodeURIComponent(hospital.destinationAddress);
-  } else {
-    destination = `${hospital.latitude},${hospital.longitude}`;
-  }
+    const destination = encodeURIComponent(
+    `${hospital.name}, ${hospital.address}`
+  );
+  // let destination;
+
+  // // ✅ If custom address exists, use it directly
+  // if (hospital.destinationAddress) {
+  //   destination = encodeURIComponent(hospital.destinationAddress);
+  // } else {
+  //   destination = `${hospital.latitude},${hospital.longitude}`;
+  // }
 
   const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${destination}`;
   window.open(url, "_blank");
